@@ -1,9 +1,9 @@
 pragma solidity ^0.4.18;
 
 import '../node_modules/zeppelin-solidity/contracts/ownership/Ownable.sol';
-import '../node_modules/zeppelin-solidity/contracts/token/ERC20/PausableToken.sol';
+import '../node_modules/zeppelin-solidity/contracts/token/ERC20/CappedToken.sol';
 
-contract CommunityCoin is Ownable, PausableToken {
+contract CommunityCoin is CappedToken, PausableToken {
 
   string public constant symbol = "CTC";
 
@@ -11,19 +11,20 @@ contract CommunityCoin is Ownable, PausableToken {
 
   uint8 public constant decimals = 18;
 
-  uint256 public constant INITIAL_SUPPLY = 1000000000 * (10 ** uint256(decimals));
-  
-  function ConmunityCoin() public {
-      totalSupply_ = INITIAL_SUPPLY;
-      paused = true;
-      balances[msg.sender] = 50;
-      Transfer(msg.sender, msg.sender, 50);
+  uint public constant unit = 10 ** uint256(decimals);
+  uint public constant INITIAL_SUPPLY = 10 ** 2 * uint;
+  uint public constant lockTime = 120 days;
+  uint public startTime;
+
+  function ConmmnityCoin() public {
+      totalSupply_ = 0;
+      startTime = now;
     }
     
-    function a() public {
-        balances[msg.sender] = 50;
-      Transfer(msg.sender, msg.sender, 50);
-    }
+     function unpause() onlyOwner whenPaused public {
+    require(now > startTime + lockTime);
+    super.unpause();
+  }
 
   function () payable public {
         revert();
