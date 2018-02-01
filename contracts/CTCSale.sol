@@ -6,31 +6,39 @@ import '../node_modules/zeppelin-solidity/contracts/math/SafeMath.sol';
 
 import './CommunityCoin.sol';
 
-contract TokenSale is CappedCrowdsale, FinalizableCrowdsale {
+contract CTCSale is CappedCrowdsale, FinalizableCrowdsale {
 
     using SafeMath for uint;
 
     uint constant private _unit  =  10 ** 18;
-    address constant private w= 0xca35b7d915458ef540ade6068dfe2f44e8fa733c;
 
     event WalletChanged(address _wallet);
 
-    function TokenSale(uint _rate,uint _cap)
-    Crowdsale(now, now + 30 minutes,_rate,w)
-    CappedCrowdsale(_cap.mul(_unit)) public {
+    function CTCSale(uint _start,uint _end,uint _rate,uint _cap,address _wallet)
+        Crowdsale(_start, _end,_rate,_wallet)
+        CappedCrowdsale(_cap.mul(_unit)) public {
     }
 
     function setToken(address tokenAddress) onlyOwner public {
         token = CommunityCoin(tokenAddress);
     }
 
-     function transferToken(address newOwner) public onlyOwner {
-    require(newOwner != address(0));
-    token.transferOwnership(newOwner);
-  }
-    function setWallet(address _wallet) {
+    function transferToken(address newOwner) onlyOwner public {
+        require(newOwner != address(0));
+        token.transferOwnership(newOwner);
+    }
+
+    function setWallet(address _wallet) onlyOwner public {
         wallet = _wallet;
         WalletChanged(_wallet);
+    }
+
+    function setStartTime(uint _start) onlyOwner public {
+        startTime = _start;
+    }
+
+    function setEndTime(uint _end) onlyOwner public {
+        endTime = _end;
     }
 
     function remainToken() view public returns(uint) {
