@@ -13,7 +13,7 @@ contract CommunityCoin is CappedToken, PausableToken {
 
   uint public constant unit = 10 ** uint256(decimals);
 
-  uint public constant tokenCap = 10 ** 6 * unit; //
+  uint public constant tokenCap = 10 ** 9 * unit; 
   
   uint public lockPeriod = 120 days;
   

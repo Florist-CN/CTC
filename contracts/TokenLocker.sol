@@ -15,7 +15,7 @@ contract TokenLocker is Ownable, ERC20Basic {
 
     mapping(address => uint) balances;
 
-    uint public pool;
+    uint private pool;
 
     uint public releaseTime;
 
@@ -26,7 +26,7 @@ contract TokenLocker is Ownable, ERC20Basic {
     
     function TokenLocker(CommunityCoin _token) public {
         token = _token;
-        releaseTime = now.add(lockPeriod);
+        releaseTime = token.startTime().add(lockPeriod);
     }
 
     function totalSupply() view public returns(uint){
@@ -43,18 +43,19 @@ contract TokenLocker is Ownable, ERC20Basic {
         uint amount = newPool.sub(pool);
         pool = newPool;
         balances[owner] = balances[owner].add(amount); 
+        Transfer(address(0), owner, amount);
     }
 
     function transfer(address _to, uint256 _value) public returns (bool) {
-    require(_to != address(0));
-    require(_value <= balances[msg.sender]);
+        require(_to != address(0));
+        require(_value <= balances[msg.sender]);
 
-    // SafeMath.sub will throw if there is not enough balance.
-    balances[msg.sender] = balances[msg.sender].sub(_value);
-    balances[_to] = balances[_to].add(_value);
-    Transfer(msg.sender, _to, _value);
-    return true;
-  }
+        // SafeMath.sub will throw if there is not enough balance.
+        balances[msg.sender] = balances[msg.sender].sub(_value);
+        balances[_to] = balances[_to].add(_value);
+        Transfer(msg.sender, _to, _value);
+        return true;
+    }
 
     function release() public {
         require(now >= releaseTime);
@@ -65,6 +66,10 @@ contract TokenLocker is Ownable, ERC20Basic {
         pool = pool.sub(amount);
         token.safeTransfer(msg.sender,amount);
         TokenReleased(msg.sender,amount);
+    }
+
+    function setToken(address tokenAddress) onlyOwner public {
+        token = CommunityCoin(tokenAddress);
     }
 
     function setReleaseTime(uint _time) onlyOwner public {
