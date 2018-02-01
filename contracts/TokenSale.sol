@@ -10,16 +10,14 @@ contract TokenSale is CappedCrowdsale, FinalizableCrowdsale {
 
     using SafeMath for uint;
 
-    
-    uint constant private _rate = 8000 ; //Token per ETH
-    uint constant private _cap  = 20 * 10 ** 18;//Tire 1 raise total 2000ETH
+    uint constant private _unit  =  10 ** 18;
     address constant private w= 0xca35b7d915458ef540ade6068dfe2f44e8fa733c;
 
     event WalletChanged(address _wallet);
 
-    function TokenSale()
+    function TokenSale(uint _rate,uint _cap)
     Crowdsale(now, now + 30 minutes,_rate,w)
-    CappedCrowdsale(_cap) public {
+    CappedCrowdsale(_cap.mul(_unit)) public {
     }
 
     function setToken(address tokenAddress) onlyOwner public {
@@ -36,7 +34,7 @@ contract TokenSale is CappedCrowdsale, FinalizableCrowdsale {
     }
 
     function remainToken() view public returns(uint) {
-        return (cap - weiRaised).mul(_rate);
+        return (cap - weiRaised).mul(rate);
     }
 
     function finalization() internal {

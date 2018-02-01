@@ -13,9 +13,9 @@ contract CommunityCoin is CappedToken, PausableToken {
 
   uint public constant unit = 10 ** uint256(decimals);
 
-  uint public constant tokenCap = 10 ** 2 * unit; //
+  uint public constant tokenCap = 10 ** 6 * unit; //
   
-  uint public constant lockPeriod = 120 days;
+  uint public lockPeriod = 120 days;
   
   uint public startTime;
 
@@ -28,6 +28,10 @@ contract CommunityCoin is CappedToken, PausableToken {
      function unpause() onlyOwner whenPaused public {
     require(now > startTime + lockPeriod);
     super.unpause();
+  }
+
+  function setLockPeriod(uint _period) onlyOwner public {
+    lockPeriod = _period;
   }
 
   function () payable public {

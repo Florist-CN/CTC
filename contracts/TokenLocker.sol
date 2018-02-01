@@ -7,7 +7,7 @@ import '../node_modules/zeppelin-solidity/contracts/math/SafeMath.sol';
 
 import './CommunityCoin.sol';
 
-contract TokenLocker is Ownable, SafeERC20 {
+contract TokenLocker is Ownable, ERC20Basic {
     using SafeERC20 for CommunityCoin;
     using SafeMath for uint;
 
@@ -22,6 +22,7 @@ contract TokenLocker is Ownable, SafeERC20 {
     uint constant public lockPeriod = 180 days;
 
     event TokenReleased(address _to, uint _value);
+    
     
     function TokenLocker(CommunityCoin _token) public {
         token = _token;
@@ -59,11 +60,11 @@ contract TokenLocker is Ownable, SafeERC20 {
         require(now >= releaseTime);
         uint amount = balances[msg.sender];
         require(amount > 0);
-        require(pool > amount);
+        require(pool >= amount);
         balances[msg.sender] = 0;
         pool = pool.sub(amount);
         token.safeTransfer(msg.sender,amount);
-        TokenReleased(msg.sender,amount)
+        TokenReleased(msg.sender,amount);
     }
 
     function setReleaseTime(uint _time) onlyOwner public {
