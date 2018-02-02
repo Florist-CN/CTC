@@ -393,7 +393,7 @@ contract CommunityCoin is CappedToken, PausableToken {
 
   string public constant symbol = "CTC";
 
-  string public constant name = "Community Coin";
+  string public constant name = "Coin of The Community";
 
   uint8 public constant decimals = 18;
 
