@@ -58,17 +58,21 @@ contract('CommunityCoin', accounts => {
     await token.setLockPeriod(0);
     await sleep(1001);
     await token.unpause();
-    token.transfer.call(accounts[1],25)
-    .then(async(res) =>{
-      await sleep(1001);
-      const balance1 = await token.balanceOf(accounts[0]);
-      const balance2 = await token.balanceOf(accounts[1]);
-      console.log(balance1);
-      assert.equal(balance1, balance2, "transfer value not correct");
-    })
+    await token.transfer(accounts[1],25);
+    const balance1 = await token.balanceOf(accounts[0]);
+    const balance2 = await token.balanceOf(accounts[1]);
+    assert.equal(balance1.toNumber(), balance2.toNumber(), "transfer value not correct");
+  });
+
+  it('can relock', async function () {
+    await token.setLockPeriod(0);
+    await sleep(1001);
+    await token.unpause();
+    token.pause.call()
+    .then(res => assert(res))
     .catch(err =>{
       console.log(err);
-      assert(false,"can not transer after lock period");
+      assert(false,"can not relock");
     });
   });
 });
