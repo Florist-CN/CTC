@@ -5,14 +5,19 @@ const BigNumber = require('bignumber.js');
 
 const option = {
     gasLimit: 4700000,
-    gasPrice: '100000000000'
+    gasPrice: '20000000000'
 };
 
 
-const teamShare = new BigNumber('30000000');
+const teamShare = new BigNumber('300000000');
 const exa = new BigNumber('1000000000000000000');
+const cap = new BigNumber('1000000000');
+const rate1 = 75000;
+const cap1 = 2000;
+const start1 = 1517850000;
+const end1 = 1520265600;
 
-const logStream = fs.createWriteStream(new Date().toISOString() + "-log.txt");
+const logStream = fs.createWriteStream("x.txt");
 // Connect to local Ethereum node
 const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 const mainAccount = web3.eth.accounts[3];
@@ -76,41 +81,41 @@ Promise.all([compileContract('CommunityCoin'), compileContract('TokenLocker'), c
 
     fs.writeFileSync('compiled.json', JSON.stringify(compiled));
 
-        deployContract(CommunityCoin, []).then(token => {
-            Promise.all(
-                [deployContract(TokenLocker, [token.address]),
-                deployContract(CTCSale, [getNow() + 240, getNow() + 1800, 85000, 2000, wallet, token.address]),
-                deployContract(CTCSale, [getNow() + 300, getNow() + 1800, 60000, 3000, wallet, token.address]),
-                deployContract(CTCSale, [getNow() + 360, getNow() + 1800, 50000, 3000, wallet, token.address])]
-            ).then(values => {
-                const locker = values[0];
-                const tier1 = values[1];
-                const tier2 = values[2];
-                const tire3 = values[3];
+    deployContract(CommunityCoin, [start1, cap]).then(token => {
+        Promise.all(
+            [deployContract(TokenLocker, [token.address]),
+            deployContract(CTCSale, [start1, end1, rate1, cap1, wallet, token.address]),]
+        ).then(values => {
+            const locker = values[0];
+            const tier1 = values[1];
 
-                const deployed = {
-                    token: token.address,
-                    locker: locker.address,
-                    tier1: tier1.address,
-                    tier2: tier2.address,
-                    tier3: tire3.address
-                };
+            const deployed = {
+                token: token.address,
+                locker: locker.address,
+                tier1: tier1.address
+            };
 
-                fs.writeFileSync('deployed.json', JSON.stringify(deployed));
+            fs.writeFileSync('deployed.json', JSON.stringify(deployed));
 
-                token.mint(deployed.locker, teamShare.times(exa),(err,res)=>{
-                    if(err){
+            token.mint(deployed.locker, teamShare.times(exa), (err, res) => {
+                if (err) {
+                    console.log(err);
+                }
+                locker.deposite();
+                token.transferOwnership(tier1.address,(err, res)=>{
+                    if(err) {
                         console.log(err);
                     }
                     console.log(res);
                 });
-            }).catch(error => {
-                log(error);
             });
-
-
+        }).catch(error => {
+            log(error);
         });
-    
+
+
+    });
+
 }).catch(error => {
     log(error);
 });
