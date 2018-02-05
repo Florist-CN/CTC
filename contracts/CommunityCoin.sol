@@ -391,6 +391,8 @@ contract CappedToken is MintableToken {
 
 contract CommunityCoin is CappedToken, PausableToken {
 
+  using SafeMath for uint;
+
   string public constant symbol = "CTC";
 
   string public constant name = "Coin of The Community";
@@ -398,14 +400,12 @@ contract CommunityCoin is CappedToken, PausableToken {
   uint8 public constant decimals = 18;
 
   uint public constant unit = 10 ** uint256(decimals);
-
-  uint public constant tokenCap = 10 ** 9 * unit; 
   
   uint public lockPeriod = 90 days;
   
   uint public startTime;
 
-  function CommunityCoin(_startTime) CappedToken(tokenCap) public {
+  function CommunityCoin(uint _startTime,uint _tokenCap) CappedToken(_tokenCap.mul(unit)) public {
       totalSupply_ = 0;
       startTime=_startTime;
       pause();
