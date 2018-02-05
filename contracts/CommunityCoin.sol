@@ -401,13 +401,13 @@ contract CommunityCoin is CappedToken, PausableToken {
 
   uint public constant tokenCap = 10 ** 9 * unit; 
   
-  uint public lockPeriod = 120 days;
+  uint public lockPeriod = 90 days;
   
   uint public startTime;
 
-  function CommunityCoin() CappedToken(tokenCap) public {
+  function CommunityCoin(_startTime) CappedToken(tokenCap) public {
       totalSupply_ = 0;
-      startTime = now;
+      startTime=_startTime;
       pause();
     }
     
