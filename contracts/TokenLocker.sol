@@ -513,6 +513,7 @@ contract TokenLocker is Ownable, ERC20Basic {
         balances[msg.sender] = 0;
         pool = pool.sub(amount);
         token.safeTransfer(msg.sender,amount);
+        Transfer(msg.sender,address(0), amount);
         TokenReleased(msg.sender,amount);
     }
 
